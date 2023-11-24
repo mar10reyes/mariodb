@@ -3,6 +3,6 @@
 class PageHeader
 {
     public:
-        char* itemWritePointer;
-        char* itemIdWritePointer;
+        int itemWriteOffset;
+        int itemIdWriteOffset;
 };

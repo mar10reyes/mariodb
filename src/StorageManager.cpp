@@ -75,6 +75,8 @@ void retrievePageFromDisk(const std::string& filename, int pageNumber, std::vect
     // Calculate the position to read based on page number and page size
     std::streampos position = static_cast<std::streampos>(pageNumber) * Page::PAGE_SIZE;
 
+    std::cout<<"pos in file: "<<position<<std::endl;
+
     std::cout<<"getting reading pos"<<std::endl;
 
     // Move to the correct position in the file

@@ -6,8 +6,9 @@
 
 //function declararions
 void testStorageManager();
+void testItemWriteToPage(Page &page, std::vector<char> itemToAdd);
 
-//g++ -o program src/*.cpp -I include
+// g++ -std=c++11 -o program src/*.cpp -I include
 
 int main(int argc, char const *argv[])
 {
@@ -22,8 +23,22 @@ void testStorageManager() {
     int pageNumber = 0;
 
     // Create a sample page with data (you should replace this with your actual page data)
-    std::vector<char> pageData(Page::PAGE_SIZE, 'A');
-    Page page = Page(pageData);
+    //std::vector<char> pageData(Page::PAGE_SIZE, 'A');
+    //Page page = Page(pageData);
+    Page page = Page();
+    //page.pageNumber = pageNumber;
+    //page.header = PageHeader();
+    //page.header.itemWriteOffset = 32;
+
+    std::vector<char> item(16, 'C');
+
+    testItemWriteToPage(page, item);
+
+    std::cout<<"page before storage manager"<<std::endl;
+    // Display the retrieved page data (replace this with your actual processing)
+    for (int i=0; i < Page::PAGE_SIZE; i++) {
+        std::cout << page.items[i];
+    }
 
     StorageManager storageManager = StorageManager(filename, filename);
 
@@ -41,10 +56,13 @@ void testStorageManager() {
     Page page1 = storageManager.getPage(0);
 
     std::cout<<"page retrieved!"<<std::endl;
-
-    // Display the retrieved page data (replace this with your actual processing)
-    for (int i=0; i < Page::PAGE_SIZE; i++) {
-        std::cout << page1.items[i];
-    }
     
+}
+
+void testItemWriteToPage(Page &page, std::vector<char> itemToAdd) {
+    std::cout<<"adding item..."<<std::endl;
+    ItemId itemId = page.AddItem(itemToAdd);
+
+    std::cout<<"item added at page: "<<itemId.pageId<<std::endl;
+    std::cout<<"item added at slot: "<<itemId.slotInPage<<std::endl;
 }
