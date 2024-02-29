@@ -1,9 +1,11 @@
 #pragma once
 
+#include "Page.hpp"
+
 class BufferPool
 {
     public:
-        //directory* page_directory;
+        std::vector<Page> frames;
     public:
         BufferPool(/* args */);
         ~BufferPool();
