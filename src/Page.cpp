@@ -63,9 +63,6 @@ ItemId Page::AddItem(std::vector<char> item)
 
     this->header.itemWriteOffset   += -item_size;
     this->header.itemIdWriteOffset += item_id_size;
-
-    std::cout<<"itemWriteOffset: "<<this->header.itemWriteOffset<<std::endl;
-    std::cout<<"itemIdWriteOffset: "<<this->header.itemIdWriteOffset<<std::endl;
     
     return itemId;
 }
