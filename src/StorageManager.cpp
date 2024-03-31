@@ -1,6 +1,8 @@
 #include "StorageManager.hpp"
 #include <fstream>
 #include <iostream>
+#include <cstring>
+#include <cstdint> // For types like uint32_t
 
 // Function prototypes
 void storePageOnDisk(const std::string& filename, Page page);
@@ -8,6 +10,23 @@ void retrievePageFromDisk(const std::string& filename, int pageNumber, std::vect
 
 StorageManager::StorageManager(const std::string& dbname, const std::string& dbFilepath)
     : databaseName(dbname), databaseFilePath(dbFilepath) {}
+
+
+// Function to print the binary representation of a byte
+void printByteAsBits2(unsigned char byte) {
+    for (int i = 7; i >= 0; --i) {
+        std::cout << ((byte >> i) & 1);
+    }
+}
+
+// Function to print a set of bytes as bits
+void printBytesAsBits2(const unsigned char* bytes, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        printByteAsBits2(bytes[i]);
+        std::cout << ' '; // Separate bytes by space
+    }
+    std::cout << std::endl;
+}
 
 bool StorageManager::flushPage(Page page) {
     // Assuming you want to open a file for writing
@@ -38,7 +57,23 @@ Page StorageManager::getPage(int pageNumber) {
     //pageData.clear();
     //pageData.resize(Page::PAGE_SIZE);
 
+    // std::cout<<"pageNumber from retrievePageFromDisk: "<<pageNumber<<std::endl;
+
     retrievePageFromDisk(this->databaseFilePath, pageNumber, pageData);
+
+    //Page p1 = Page(pageData);
+    
+    // char itemIds[6 * ItemId::SIZE];
+    //char currentItemId[16];
+    
+    // std::memcpy(currentItemId, itemIds, ItemId::SIZE);
+    //std::memcpy(currentItemId, pageData.data(), (size_t)16);
+
+    //size_t dataSize = sizeof(currentItemId);
+
+    //std::cout << "Data in (xxx) bits: ";
+    //printBytesAsBits2((const unsigned char*)currentItemId, dataSize);
+
     //std::cout<<"page[1]: "<<pageData[0]<<std::endl;
     return Page(pageData); // Placeholder return value, modify as needed
 }
@@ -50,10 +85,12 @@ StorageManager::~StorageManager() {
 // Function to store a page on disk
 void storePageOnDisk(const std::string& filename, Page page) {
     
-    int pageNumber              = page.pageNumber;
+    int pageNumber              = 0; //needs to be here because I put 222 as page number to test if the page number was beeing correct while other parts of the code still have 0 as page number
+    // int pageNumber              = page.pageNumber;
     std::vector<char>& pageData = page.items;
     
     std::ofstream file(filename, std::ios::binary | std::ios::in | std::ios::out);
+    //std::ofstream file(filename, std::ios::binary | std::ios::in | std::ios::out);
 
     // Calculate the position to write based on page number and page size
     std::streampos position = static_cast<std::streampos>(pageNumber) * Page::PAGE_SIZE;
@@ -62,6 +99,7 @@ void storePageOnDisk(const std::string& filename, Page page) {
     file.seekp(position);
 
     // Write the page data to the file
+    // file.write(pageData.data(), Page::PAGE_SIZE);
     file.write(pageData.data(), Page::PAGE_SIZE);
 
     // Close the file
@@ -70,7 +108,7 @@ void storePageOnDisk(const std::string& filename, Page page) {
 
 // Function to retrieve a page from disk
 void retrievePageFromDisk(const std::string& filename, int pageNumber, std::vector<char>& pageData) {
-    std::ifstream file(filename, std::ios::binary | std::ios::in);
+    std::ifstream file(filename, std::ios::binary);
 
     // Calculate the position to read based on page number and page size
     std::streampos position = static_cast<std::streampos>(pageNumber) * Page::PAGE_SIZE;
