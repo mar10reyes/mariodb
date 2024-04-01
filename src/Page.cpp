@@ -15,7 +15,31 @@ Page::Page()
     this->pageNumber = 0;
     this->header = PageHeader();
     this->header.itemWriteOffset   = PAGE_SIZE;
-    this->header.itemIdWriteOffset = 0;
+    this->header.itemIdWriteOffset = HEADER_SIZE; //write after the header
+    // this->header.itemIdWriteOffset = 0; //write after the header
+}
+
+bool UpdateOffsets(int itemWriteOffset, int itemIdWriteOffset, Page &page)
+{
+    std::vector<char> offsets(Page::HEADER_SIZE); // Allocate space for both integers and is Available boolean
+
+    char* itemWriteOffsetInBytes = reinterpret_cast<char*>(&itemWriteOffset);
+    std::copy(itemWriteOffsetInBytes, itemWriteOffsetInBytes + sizeof(int), offsets.begin());
+
+    // Copy bytes of slotInPage into the char vector after pageId
+    char* itemIdWriteOffsetInBytes = reinterpret_cast<char*>(&itemIdWriteOffset);
+    std::copy(itemIdWriteOffsetInBytes, itemIdWriteOffsetInBytes + sizeof(int), offsets.begin() + sizeof(int));
+
+    int i = 0;
+    int j = 0;
+
+    while (j < offsets.size()) {
+        page.items[i] = offsets[j];
+        i++;
+        j++;
+    }
+
+    return true;
 }
 
 ItemId Page::AddItem(std::vector<char> item)
@@ -63,6 +87,8 @@ ItemId Page::AddItem(std::vector<char> item)
 
     this->header.itemWriteOffset   += -item_size;
     this->header.itemIdWriteOffset += item_id_size;
+
+    UpdateOffsets(this->header.itemWriteOffset, this->header.itemIdWriteOffset, *this);
     
     return itemId;
 }
