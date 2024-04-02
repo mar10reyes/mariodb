@@ -14,9 +14,7 @@ class Page {
         std::vector<char> items;
     public:
         Page();
-        Page(std::vector<char>& items) {
-            this->items = items;
-        }
+        Page(std::vector<char>& items);
         ItemId AddItem(std::vector<char> item);
         char* GetPageItems();
         char* GetItem(ItemId itemId);

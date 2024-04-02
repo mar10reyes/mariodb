@@ -9,14 +9,23 @@ std::vector<char> itemIdToCharVec(ItemId itemId);
 Page::Page()
 {
     // init page with default values
-    std::vector<char> pageData(Page::PAGE_SIZE, 'A');
+    std::vector<char> pageData(Page::PAGE_SIZE, 0);
     this->items = pageData;
     
     this->pageNumber = 0;
     this->header = PageHeader();
     this->header.itemWriteOffset   = PAGE_SIZE;
     this->header.itemIdWriteOffset = HEADER_SIZE; //write after the header
-    // this->header.itemIdWriteOffset = 0; //write after the header
+}
+
+Page::Page(std::vector<char>& items) 
+{
+    this->items = items;
+
+    this->pageNumber = 0;
+    this->header = PageHeader();
+    this->header.itemWriteOffset   = PAGE_SIZE;
+    this->header.itemIdWriteOffset = HEADER_SIZE; //write after the header
 }
 
 bool UpdateOffsets(int itemWriteOffset, int itemIdWriteOffset, Page &page)
