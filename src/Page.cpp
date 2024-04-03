@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string.h>
 #include <cstring>
+#include <stdexcept>
 
 //function declaration
 std::vector<char> itemIdToCharVec(ItemId itemId);
@@ -53,11 +54,12 @@ bool UpdateOffsets(int itemWriteOffset, int itemIdWriteOffset, Page &page)
 
 ItemId Page::AddItem(std::vector<char> item)
 {
+    if(!HasSpaceForItem(item)) throw std::bad_alloc();
+
     int offset = this->header.itemWriteOffset;
 
     int item_size = item.size();
 
-    //FIXME: make sure inludes other things like headers and other data that is included in a page
     if (offset >= 0 && offset <= PAGE_SIZE) {
         
         int i = offset - item_size;
@@ -102,7 +104,6 @@ ItemId Page::AddItem(std::vector<char> item)
     return itemId;
 }
 
-//FIXME: this method only works when the itemId reinterpretation to char makes sense as a character, otherwise it wont write it to page therefor to disk.
 std::vector<char> itemIdToCharVec(ItemId itemId) {
 
     int pageId       = itemId.pageId;
@@ -124,4 +125,23 @@ std::vector<char> itemIdToCharVec(ItemId itemId) {
     std::copy(isAvailableInBytes, isAvailableInBytes + sizeof(bool), mergedData.begin() + sizeof(int) + sizeof(int));
 
     return mergedData;
+}
+
+bool Page::HasSpaceForItem(std::vector<char> item)
+{
+    int item_size = item.size();
+
+    ItemId itemId = ItemId();
+    itemId.pageId = this->pageNumber;
+
+    itemId.slotInPage = this->header.itemWriteOffset;;
+    itemId.isAvailable = false;
+    const std::vector<char> itemIdInCharVect = itemIdToCharVec(itemId);
+    int item_id_size = itemIdInCharVect.size();
+
+    if(this->header.itemWriteOffset - item_size < this->header.itemIdWriteOffset + item_id_size) {
+        return false;
+    }
+
+    return true;
 }

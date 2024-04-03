@@ -20,4 +20,5 @@ class Page {
         char* GetItem(ItemId itemId);
         void DeleteItem(ItemId itemId);
         void UpdateItem(ItemId itemId);
+        bool HasSpaceForItem(std::vector<char> item);
 };
